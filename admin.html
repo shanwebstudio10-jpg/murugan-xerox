@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ta"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin - Config Maker</title>
+<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:auto;padding:16px;background:#f4f6f5}
+input,select{padding:7px;border:1px solid #bbb;border-radius:6px;font-size:14px;width:100%}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+table{width:100%;border-collapse:collapse;background:#fff}td{padding:4px;border-bottom:1px solid #eee}
+button{padding:10px 16px;border:0;border-radius:8px;background:#128c7e;color:#fff;font-size:15px;cursor:pointer;margin:6px 6px 6px 0}
+.x{background:#c62828;padding:6px 10px}</style></head><body>
+<h2>கடை அமைப்பு (Config Maker)</h2>
+<p>மாற்றங்களைச் செய்து, "config.js பதிவிறக்கு" அழுத்தவும். வந்த file-ஐ project folder-ல் உள்ள config.js மேல் replace செய்யவும்.</p>
+<div class="g" id="f"></div>
+<h3>பொருட்கள் / சேவைகள்</h3>
+<table><thead><tr><td>Emoji</td><td>பெயர்</td><td>விலை</td><td>Unit</td><td>Category</td><td></td></tr></thead><tbody id="b"></tbody></table>
+<button onclick="addRow()">+ புதிய வரி</button><button onclick="dl()">⬇ config.js பதிவிறக்கு</button>
+<script src="config.js"></script>
+<script>
+const C = JSON.parse(JSON.stringify(window.SHOP_CONFIG));
+C.delivery = C.delivery || {charge:0,freeAbove:0}; C.features = C.features || {};
+const fields = [["name","கடை பெயர்"],["tagline","Tagline"],["whatsapp","WhatsApp (91xxxxxxxxxx)"],["theme","நிறம் (#hex)"],["currency","Currency"],["footer","Footer"],["fileHint","File குறிப்பு"]];
+document.getElementById("f").innerHTML = fields.map(([k,l]) => `<label>${l}<input id="f_${k}" value="${(C[k]||"").replace(/"/g,"&quot;")}"></label>`).join("") +
+ `<label>டெலிவரி கட்டணம்<input id="d_c" type="number" value="${C.delivery.charge||0}"></label>
+  <label>இலவச டெலிவரி (இதற்கு மேல்)<input id="d_f" type="number" value="${C.delivery.freeAbove||0}"></label>
+  <label>குறைந்தபட்ச order<input id="m_o" type="number" value="${C.features.minOrder||0}"></label>
+  <label>டெலிவரி வசதி<select id="x_d"><option value="1">உண்டு</option><option value="0" ${C.features.delivery===false?"selected":""}>இல்லை</option></select></label>
+  <label>File குறிப்பு காட்ட<select id="x_h"><option value="1">ஆம்</option><option value="0" ${C.features.fileHint===false?"selected":""}>இல்லை</option></select></label>`;
+const b = document.getElementById("b");
+function addRow(it = {emoji:"🛍️",name:"",price:0,unit:"எண்",cat:""}) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = ["emoji","name","price","unit","cat"].map(k => `<td><input data-k="${k}" ${k==="price"?'type="number"':""} value="${String(it[k]??"").replace(/"/g,"&quot;")}"></td>`).join("") + `<td><button class="x" onclick="this.closest('tr').remove()">✕</button></td>`;
+  b.appendChild(tr);
+}
+C.items.forEach(addRow);
+function dl() {
+  const v = id => document.getElementById(id).value;
+  fields.forEach(([k]) => C[k] = v("f_" + k));
+  C.delivery = {charge:+v("d_c"), freeAbove:+v("d_f")};
+  C.features = Object.assign(C.features, {minOrder:+v("m_o"), delivery:v("x_d")==="1", fileHint:v("x_h")==="1"});
+  C.items = [...b.rows].map(r => { const o = {}; r.querySelectorAll("input").forEach(i => o[i.dataset.k] = i.dataset.k==="price" ? +i.value : i.value); return o; }).filter(o => o.name);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["window.SHOP_CONFIG = " + JSON.stringify(C, null, 2) + ";"], {type:"text/javascript"}));
+  a.download = "config.js"; a.click();
+}
+</script></body></html>

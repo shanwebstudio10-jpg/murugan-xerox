@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ta"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order</title><link rel="stylesheet" href="css/style.css"></head>
+<body>
+<header><h1 id="n"></h1><p id="t"></p></header>
+<div class="bar" id="cats"></div>
+<input id="search">
+<div class="grid" id="grid"></div>
+<footer id="foot"></footer>
+<button id="cartbtn" onclick="openCart()"><span id="cc"></span><span id="ct"></span></button>
+<div id="modal" onclick="if(event.target===this)closeCart()"><div class="sheet">
+  <button class="close" onclick="closeCart()">×</button><h2 id="oh"></h2>
+  <div id="items"></div>
+  <div id="modes" class="modes"></div>
+  <div class="row"><span id="l1"></span><span id="sub"></span></div>
+  <div class="row" id="frow"><span id="l2"></span><span id="fee"></span></div>
+  <div class="total"><span id="l3"></span><span id="tot"></span></div>
+  <input id="cname"><input id="cphone" inputmode="numeric"><textarea id="caddr" rows="2"></textarea><textarea id="cnote" rows="2"></textarea>
+  <p id="hint" class="hint"></p>
+  <button class="send" id="send" onclick="sendOrder()"></button>
+</div></div>
+<script src="config.js"></script><script src="js/app.js"></script>
+</body></html>
